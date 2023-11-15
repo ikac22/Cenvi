@@ -1,0 +1,12 @@
+# call from excercise directory
+
+CPP_FILES = ../main.cpp imp.cpp 
+# add new files
+CPP_FILES += 
+
+CPPC = g++ 
+CPPC_FLAGS = -Iinc -I../inc
+
+
+build: $(CPP_FILES)
+	$(CPPC) -o sol.elf $(CPP_FILES)
