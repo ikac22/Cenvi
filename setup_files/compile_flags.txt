@@ -1,4 +1,4 @@
 -I 
 inc
 -I
-../inc
+<to_main>inc
