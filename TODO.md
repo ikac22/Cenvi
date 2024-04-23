@@ -3,3 +3,4 @@
     - Add project/coding support to rofi-setup.sh
 - Create profile support
 - Open new workaspace in newli created problem/project directory
+- Beautify filesystem
