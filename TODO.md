@@ -1,0 +1,5 @@
+- Make setup.sh more modular like rofi-setup.sh
+- Add project/coding support in setup.
+    - Add project/coding support to rofi-setup.sh
+- Create profile support
+- Open new workaspace in newli created problem/project directory
