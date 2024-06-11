@@ -14,19 +14,19 @@ ctf_new_init(){
 
 	declare_flag_map NEW_CTF_MAP \
 		"a" "archive" "problem archive" "Path to archive containing problem files. It will be moved and extrated." \
-		"ctf_new_check_archive" \
-		"-" "ctf_new_move_archive" "false"
+		"ctf_check_archive NEW_CTF_MAP" \
+		"-" "ctf_move_archive NEW_CTF_MAP" "false"
 
 	declare_flag_map NEW_CTF_MAP \
 		"f" "files" "problem files" "Paths to problem files(comma separated)." \
-		"ctf_new_check_files" \
-		"-" "ctf_new_move_files" "false"
+		"ctf_check_files NEW_CTF_MAP" \
+		"-" "ctf_move_files NEW_CTF_MAP" "false"
 	
 
 	declare_flag_map NEW_CTF_MAP \
 		"d" "directory" "problem dir" "Path to dir containing problem files. It will be moved."\
-		"ctf_new_check_dir" \
-		"-" "ctf_new_move_dir" "false"
+		"ctf_check_dir NEW_CTF_MAP" \
+		"-" "ctf_move_dir NEW_CTF_MAP" "false"
 	
 	declare_flag_map NEW_CTF_MAP \
 		"" "cpp" "" "Create only files folder no env needed." \
@@ -44,14 +44,14 @@ ctf_new_init(){
 		"*"  "" "true"
 
 	declare_flag_map NEW_CTF_MAP \
-		"" "nvim" "open nvim" "Open Nvim in directory of a problem." \
+		"" "nvim" "workspace" "Open Nvim in directory of a problem in specified i3 workspace (default tmp workspace)." \
 		"" \
-		"false" "ctf_new_open_nvim" "false"
+		"-" "ctf_open_nvim NEW_CTF_MAP" "false"
 	
 	declare_flag_map NEW_CTF_MAP \
-		"" "ranger" "open ranger" "Open Ranger in directory of a problem." \
+		"" "ranger" "workspace" "Open Ranger in directory of a problem in specified i3 workspace. (default tmp workspace)" \
 		"" \
-		"false" "ctf_new_open_ranger" "false"
+		"-" "ctf_open_ranger NEW_CTF_MAP" "false"
 }
 
 ctf_new_setup(){
@@ -70,43 +70,6 @@ ctf_new_setup(){
 ctf_new_check_name(){
 	local name="$(mg "${NEW_CTF_MAP["$1"]}" "VALUE" )"
 	name_validity "$name" "$2"	
-}
-
-
-ctf_new_check_archive(){
-	local arch="$(mg "${NEW_CTF_MAP["-a"]}" "VALUE")"	
-	if [ -f "$arch" ]; then
-		case "$arch" in 
-			*.zip | *.tar.gz |*.tgz | *.tar | *.gz | *.tar.bz2)	;;
-			*)	echo -e "Unsupported ctf problem archive extension.\nIt will not be Extracted: $arch"
-				;;
-			
-		esac
-		CTF_PROBLEM_ARCHIVE=$1
-	else
-		echo "Specified ctf problem archive does not exist: $arch"
-		exit
-	fi
-}
-
-ctf_new_check_files(){
-	local FILES="$(mg "${NEW_CTF_MAP["-f"]}" "VALUE" )"
-	local CTF_PROBLEM_FILES=(${FILES//,/ })
-	for file in ${CTF_PROBLEM_FILES[@]}; do
-		if [ ! -f "$file" ]; then
-			echo "Specified ctf problem file does not exist: $file"
-			exit
-		fi
-	done
-}
-
-ctf_new_check_dir(){
-	local dir="$(mg "${NEW_CTF_MAP["-d"]}" "VALUE" )"
-	if [ ! -d "$dir" ]; then
-		echo "Specified ctf problem directory does not exist: $1"
-		exit
-	fi
- 
 }
 
 # JOB FUNSTIONS
@@ -151,45 +114,6 @@ ctf_new_create_problem(){
 	fi
 }
 
-ctf_new_move_archive(){
-
-	local arch="$(mg "${NEW_CTF_MAP["-a"]}" "VALUE")"	
-
-	cp $arch $CTF_PROB_FILES_DIR
-	echo "Copying archive with problem files to problem dir..."	
-	echo -e "\t$arch"
-	local CPA="$(basename $arch)"
-	echo "Decrompessing given archive to files directory..."
-	cd $CTF_PROB_FILES_DIR
-	case $arch in
-		*.zip)	7z x $CPA 
-			;;
-		*.tar.gz | *.tgz | *.tar | *.tar.bz2)
-			tar -xf $CPA
-			;;
-		*.gz)	gunzip $CPA
-			;;
-		*)	;;
-	esac
-	cd -
-
-}
-
-ctf_new_move_files(){
-	local FILES="$(mg "${NEW_CTF_MAP["-f"]}" "VALUE" )"
-	local CTF_PROBLEM_FILES=(${FILES//,/ })
-
-	echo "Copying problem files to problem dir.."
-	for file in ${CTF_PROBLEM_FILES[@]}; do
-		cp ${file} $CTF_PROB_FILES_DIR
-	done
-}
-
-ctf_new_move_dir(){
-	local dir="$(mg "${NEW_CTF_MAP["-d"]}" "VALUE" )"
-	echo "Copying files from specified directory to problem dir..."
-	cp $dir/* $CTF_PROB_FILES_DIR
-}
 
 create_cpp_env(){	
 	echo "Creating C++ environment in problem dir..."

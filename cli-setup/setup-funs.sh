@@ -12,6 +12,7 @@ declare_action_maps(){
 	declare -g -A "EDIT_$mn"
 	declare -g -A "PROFILE_$mn"
 	declare -g -A "OPEN_$mn"
+	declare -g -A "LIST_$mn"
 
 	local -n M="$mn"
 	local -n C="$fn"
@@ -21,6 +22,7 @@ declare_action_maps(){
 	M["profile"]="PROFILE_$mn"
 	M["delete"]="DELETE_$mn"
 	M["open"]="OPEN_$mn"
+	M["list"]="LIST_$mn"
 
 	eval "${C["init"]}"
 }
@@ -69,10 +71,10 @@ declare_flag_map(){
 		help_msg="$(print_option "$flags" "$4" "$5")"
 	fi
 
-	M["-$2"]="${3}_map"
-	M["--$3"]="${3}_map"
-	declare -g -A "${3}_map"	
-	local -n vm="${3}_map" # value_map
+	M["-$2"]="${1}_${3}_map"
+	M["--$3"]="${1}_${3}_map"
+	declare -g -A "${1}_${3}_map"	
+	local -n vm="${1}_${3}_map" # value_map
 	
 	vm["HELP_MSG"]="$help_msg"
 	vm["CHECK_FUN"]="$check_fun"
@@ -222,4 +224,24 @@ optional_jobs(){
 			eval "${vm["WORK_FUN"]}"	
 		fi
 	done
+}
+
+ws_run_command(){
+	local ws="$1"
+	local tmp_ws="$(i3-msg -t get_workspaces | jq | grep '"focused": true' -B 3 | head -1 | sed 's/\"num\": \([1-9]\),/\1/')"	
+	if [ "$ws" == "" ]; then
+		ws="$tmp_ws"	
+	fi
+	i3-msg "workspace --no-auto-back-and-forth $ws; exec \"$2\"" > /dev/null
+}
+
+list_dir(){
+	if [ $2 -eq 1 ]; then
+		printf "$3%s\n" $(ls $1)
+	else
+		for dir in $(printf "%s\n" $(ls $1)); do
+			printf "$3%s\n" $dir
+			list_dir "$1/$dir" $(( $2 - 1 )) "$3\\t"
+		done
+	fi
 }

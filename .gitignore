@@ -1,1 +1,9 @@
 problems/*
+setup_files/*
+src/*
+java_eclipse_workspace/*
+inc/*
+design/*
+compile_flags.txt
+test.sh
+setup.sh

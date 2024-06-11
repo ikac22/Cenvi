@@ -18,7 +18,7 @@ ctf_delete_init(){
 		"*"  "" "true"
 
 	declare_flag_map DELETE_CTF_MAP \
-		"a" "all" "all files" "Can be specified with competition name only or with competition name and category to delete all files within specified competition/category" \
+		"a" "all" "" "Can be specified with competition name only or with competition name and category to delete all files within specified competition/category" \
 		"ctf_delete_unmand" "false" "" "false"
 }
 
@@ -29,6 +29,7 @@ ctf_delete_setup(){
 	ctf_delete_name
 	ctf_delete_category
 	ctf_delete_all
+
 
 	ctf_delete_problem
 }
